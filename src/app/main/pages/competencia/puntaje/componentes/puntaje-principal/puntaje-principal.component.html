@@ -1,0 +1,250 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card box-shadow-sm">
+            <div class="card-footer">
+                <form detail-content [formGroup]="formPuntajeParametro" (ngSubmit)="listarPuntajePorParticipante()">
+                    <div class="row form-group" [ngStyle]="{'display': displayNone}">
+                        <div class="col-2">
+                            <label for="codCategoria">
+                                <h4><b>{{'Categoría(*): '}}</b></h4>
+                            </label>
+                            <select name="codCategoria" formControlName="codCategoria" required
+                                [compareWith]="compararCategoria" placeholder="Seleccione categoría..."
+                                class="form-control mr-sm-2" id="codCategoria"
+                                (change)="listarSubcategoriaPorCategoria()">
+                                <option [value]="''" selected>Seleccionar categoría</option>
+                                <option *ngFor="let categoria  of listaCategoria" [value]="categoria.codigo">
+                                    <span><b>{{categoria?.denominacion}}</b></span>
+                                </option>
+                            </select>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                        </div>
+                        <div class="col-2">
+                            <label for="codSubcategoria">
+                                <h4><b>{{'Subcategoría(*): '}}</b></h4>
+                            </label>
+                            <select name="codSubcategoria" formControlName="codSubcategoria" required required
+                                [compareWith]="compararSubcategoria" placeholder="Seleccione subcategoría..."
+                                class="form-control mr-sm-2 custom-select" id="codSubcategoria"
+                                (change)="listarInstanciaActivo()">
+                                <option [value]="''" selected>Seleccionar subcategoría</option>
+                                <option *ngFor="let subcategoria  of listaSubcategoria" [value]="subcategoria.codigo">
+                                    <span><b>{{subcategoria?.denominacion}}</b></span>
+                                </option>
+                            </select>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                        </div>
+                        <div class="col-2">
+                            <label for="codInstancia">
+                                <h4><b>{{'Instancia(*): '}}</b></h4>
+                            </label>
+                            <select name="codInstancia" formControlName="codInstancia" required required
+                                [compareWith]="compararInstancia" placeholder="Seleccione instancia..."
+                                class="form-control mr-sm-2 custom-select" id="codInstancia"
+                                (change)="listarPuntajePorParticipanteJuezAdmin()">
+                                <option [value]="''" selected>Seleccionar subcategoría</option>
+                                <option *ngFor="let instancia  of listaInstancia" [value]="instancia.codigo">
+                                    <span><b>{{instancia?.denominacion}}</b></span>
+                                </option>
+                            </select>
+                            <div class="valid-feedback"></div>
+                            <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                        </div>
+                        <div class="col-2" *ngIf="listaParticipantePresentacion?.length > 0">
+                            <br />
+                            <br />
+                            <button class="btn btn-success btn-submit waves-effect waves-float waves-light"
+                                (click)="generarPDFPuntaje()">
+                                <b>{{ "Reporte Puntaje"}}</b>
+                                <b>{{ " "}}</b>
+                                <i class="fa-solid fa-pencil" style="font-size:14px;color:red"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button [ngStyle]="{'display': displayNone1}" (click)="siguienteParticipante()" type=" button"
+                        class="btn btn-primary" rippleEffect round><b>{{ "Siguiente Participante..."}}</b><i
+                            class="fa-solid fa-rotate"></i></button>
+                </form>
+                <div class="row">
+                    <div class="col-12">
+                        <ng-container>
+                            <mat-tab-group mat-align-tabs="center" #revTabGroup class="tab-group"
+                                [(selectedIndex)]="selectedTab">
+                                <mat-tab>
+                                    <section class="tab-container">
+                                        <div>
+                                            <div>
+                                                <h3><b>{{desCategoria + "/" + desSubcategoria + "/" + desInstancia}}</b>
+                                                </h3>
+                                            </div>
+                                            <table class="table" *ngIf="listaParticipantePresentacion?.length > 0"
+                                                id="tablaPuntaje">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Participante</th>
+                                                        <th *ngFor="let modeloPuntaje of this.listaModeloPuntaje; let index=index"
+                                                            scope="col">
+                                                            <div align="center">{{modeloPuntaje?.denominacion}}</div>
+                                                            <div align="center">{{modeloPuntaje?.porcentaje}} {{' %'}}
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" align="center"><div [ngStyle]="{'display': displayNone}">Puntaje Total</div></th>
+                                                        <th scope="col" align="center">Guardar</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr [ngStyle]="{'color': puntaje?.colorFila}"
+                                                        *ngFor="let participante of listaParticipantePresentacion | paginate: {id:'paginacion', itemsPerPage: itemsRegistros, currentPage: page } ; let index=index">
+                                                        <td>{{index+1}}</td>
+                                                        <td><b>{{participante?.nombrePersona}}</b></td>
+                                                        <td *ngFor="let puntaje of participante?.listaPuntajes"
+                                                            scope="col">
+                                                            <div align="center" [ngStyle]="{'display': displayNone1}">
+                                                                <input style="width: 50px; text-align:center"
+                                                                    [(ngModel)]="puntaje.puntaje"
+                                                                    (blur)="outFocus($event)" placeholder="99"
+                                                                    (change)="capturarInputs(participante)"
+                                                                    [ngModelOptions]="{standalone: true}"
+                                                                    [disabled]="idInput!='curso_'+index" type="text"
+                                                                    id="curso_{{index}}">
+                                                            </div>
+                                                            <div align="center" [ngStyle]="{'display': displayNone}">
+                                                                <input style="width: 50px; text-align:center"
+                                                                    [(ngModel)]="puntaje.puntaje"
+                                                                    (blur)="outFocus($event)" placeholder="99"
+                                                                    (change)="capturarInputs(participante)"
+                                                                    [ngModelOptions]="{standalone: true}" type="text"
+                                                                    id="curso_{{index}}">
+                                                            </div>
+                                                        </td>
+                                                        <td align="center"><b>{{participante?.puntajeTotal}}</b></td>
+                                                        <td>
+                                                            <div class="btn-group" role="group"
+                                                                [ngStyle]="{'display': displayNone1}"
+                                                                aria-label="Basic example">
+                                                                <button [disabled]="idInput!='curso_'+index"
+                                                                    (click)="verificarGuardarPuntajes(participante, 'curso_'+index)"
+                                                                    type="button" class="btn btn-success"
+                                                                    matTooltip="Guardar Puntaje" rippleEffect><i
+                                                                        class="fa fa-floppy-o"></i></button>
+                                                                <button [ngStyle]="{'display': 'none'}"
+                                                                    (click)="editarPuntaje(participante, 'curso_'+index)"
+                                                                    type=" button" class="btn btn-primary" rippleEffect
+                                                                    round><i class="fa fa-pencil"></i></button>
+                                                            </div>
+                                                            <div class="btn-group" role="group"
+                                                                [ngStyle]="{'display': displayNone}"
+                                                                aria-label="Basic example">
+                                                                <button
+                                                                    (click)="verificarGuardarPuntajes(participante, 'curso_'+index)"
+                                                                    type="button" class="btn btn-success"
+                                                                    matTooltip="Guardar Puntaje" rippleEffect><i
+                                                                        class="fa fa-floppy-o"></i></button>
+                                                                <button [ngStyle]="{'display': 'none'}"
+                                                                    (click)="editarPuntaje(participante, 'curso_'+index)"
+                                                                    type=" button" class="btn btn-primary" rippleEffect
+                                                                    round><i class="fa fa-pencil"></i></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="row mt-5"
+                                                *ngIf="listaParticipantePresentacion?.length > itemsRegistros">
+                                                <div class="col-12 text-center">
+                                                    <pagination-controls id="paginacion" class="paginacion"
+                                                        [responsive]="true" [autoHide]="true" previousLabel="Anterior"
+                                                        nextLabel="Siguiente" (pageChange)="page = $event"
+                                                        screenReaderCurrentLabel="Tú estas en la página:">
+                                                    </pagination-controls>
+                                                </div>
+                                            </div>
+                                            <ng-container *ngIf="listaParticipantePresentacion?.length === 0">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <p>No hay datos disponibles</p>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                            <br />
+                                            <div class="row form-group"
+                                                *ngIf="listaParticipantePresentacion?.length > 0"
+                                                [ngStyle]="{'display': 'none'}">
+                                                <div class="col-12">
+                                                    <label for="seguimiento">
+                                                        <h3><b>{{'Seguimiento del Participante:'}}</b></h3>
+                                                    </label>
+                                                    <div class="form-group form-check"
+                                                        *ngFor="let seguimiento of listaSeguimiento; let indice=index">
+                                                        <input type="checkbox" [value]="seguimiento"
+                                                            (click)="guardarParticipanteSeguimiento(seguimiento, $event, indice)"
+                                                            class="form-check-input" id="exampleCheck{{indice}}"
+                                                            [checked]="seguimiento.asignado">
+                                                        <label class="form-check-label" for="exampleCheck1">
+                                                            <h4><b>{{seguimiento?.descripcion}}</b></h4>
+                                                        </label>
+                                                    </div>
+                                                    <br>
+                                                    <div class="valid-feedback">
+                                                        <span>{{ "Exito"}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                </mat-tab>
+                            </mat-tab-group>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-form-puntaje [puntajeEditar]="puntajeSeleccionado" [codigoChild]="codigo" [descripcionChild]="descripcion"
+    [listaPuntajeChild]="listaPuntaje" (close)="closeDetail($event)" *ngIf="showDetail">
+</app-form-puntaje>
+
+<ng-template #modal_confirm_delete let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Confirmar borrado.'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close('no')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{'¿Quieres borrar el registro?'}}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close('yes')">{{'Si'}}</button>
+        <button type="button" class="btn btn-outline-dark" (click)="modal.close('no')">{{'No'}}</button>
+    </div>
+</ng-template>
+<ng-template #modal_success let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Exito'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{'El registro ha sido borrada con éxito'}}
+    </div>
+</ng-template>
+
+<ng-template #modal_error let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Error'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{'Ha habido un problema al borrar el registro'}}
+    </div>
+</ng-template>

@@ -1,0 +1,74 @@
+<app-detail (close)="closeDetail($event)">
+    <h1 detail-title><strong>{{categoriaEditar ?'EDITAR':'AGREGAR'}}</strong></h1>
+    <form detail-content [formGroup]="formCategoria" (ngSubmit)="addRegistro()">
+        <div class="row form-group">
+            <div class="col-12">
+                <label for="denominacion">{{'Denominación(*): '}}</label>
+                <input type="text" name="denominacion" formControlName="denominacion" class="form-control"
+                    id="denominacion" oninput="denominacion.value = denominacion.value.toUpperCase()"
+                    [ngClass]="{'is-valid': denominacionField?.dirty && !denominacionField?.invalid && !denominacionField?.errors,'is-invalid': denominacionField?.dirty && denominacionField?.invalid && denominacionField?.errors}">
+                <div class="valid-feedback">
+                    <span>{{ "Exito"}}</span>
+                </div>
+                <div class="invalid-feedback">
+                    <span *ngIf="denominacionField?.errors?.['required']">{{"Requerido"}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-3">
+                <label for="edadMinima"><b>{{'Edad Mínima(*):'}}</b></label>
+                <input type="number" name="edadMinima" formControlName="edadMinima" class="form-control" id="edadMinima"
+                    placeholder="99" step="0.01" min="0.01"
+                    [ngClass]="{'is-valid': edadMinimaField?.dirty && !edadMinimaField?.invalid && !edadMinimaField?.errors && (edadMinimaField?.value > edadMinimaField?.value), 'is-invalid': edadMinimaField?.dirty && edadMinimaField?.invalid && edadMinimaField?.errors  && !(edadMinimaField?.value > edadMinimaField?.value)}">
+                <div class="valid-feedback">
+                    <span>{{ "Exito"}}</span>
+                </div>
+                <div class="invalid-feedback">
+                    <span *ngIf="edadMinimaField?.errors?.['required']">{{"Requerido"}}</span>
+                </div>
+            </div>
+            <div class="col-3">
+                <label for="edadMaxima"><b>{{'Edad Máxima(*):'}}</b></label>
+                <input type="number" name="edadMaxima" formControlName="edadMaxima" class="form-control" id="edadMaxima"
+                    placeholder="99" step="0.01" min="0.01"
+                    [ngClass]="{'is-valid': edadMaximaField?.dirty && !edadMaximaField?.invalid && !edadMaximaField?.errors && (edadMaximaField?.value > edadMaximaField?.value), 'is-invalid': edadMaximaField?.dirty && edadMaximaField?.invalid && edadMaximaField?.errors  && !(edadMaximaField?.value > edadMaximaField?.value)}">
+                <div class="valid-feedback">
+                    <span>{{ "Exito"}}</span>
+                </div>
+                <div class="invalid-feedback">
+                    <span *ngIf="edadMaximaField?.errors?.['required']">{{"Requerido"}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-block btn-primary" [disabled]="formCategoria?.invalid">
+                    {{categoriaEditar?'GUARDAR':'GUARDAR'}}</button>
+            </div>
+        </div>
+    </form>
+</app-detail>
+<ng-template #modal_success let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Éxito'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{categoriaEditar?'Se ha actualizado el registro correctamente.':'Se ha agregado el registro correctamente.'}}
+    </div>
+</ng-template>
+<ng-template #modal_error let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Error'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{categoriaEditar?'Ha habido un problema al actualizar el registro.':'Ha habido un problema al agregar el
+        registro.'}}
+    </div>
+</ng-template>

@@ -1,0 +1,263 @@
+<app-detail (close)="closeDetail($event)">
+    <h1 detail-title><strong>{{transaccionEditar ? nombreProceso :'AGREGAR'}}{{ ' Transacción'}}</strong></h1>
+    <form detail-content [formGroup]="formTransaccionConsulta" (ngSubmit)="addRegistro()">
+        <div class="container" style="border: 0px solid blue; box-shadow: 0px 10px 10px black">
+            <div class="row form-group">
+                <div class="col-6 flex justify-end card profile-header mb-2 was-validated">
+                    <label for="codCliente"><b>{{'Cliente(*): '}}</b></label>
+                    <select name="codCliente" formControlName="codCliente" required placeholder="Seleccione Cliente..."
+                        class="form-control mr-sm-2" id="codCliente" [compareWith]="compararCliente"
+                        (change)="buscarClientePorCodigo()">
+                        <option [value]="" selected>Seleccionar Cliente</option>
+                        <option *ngFor="let cliente of listaCliente" [value]="cliente.codigo">
+                            <span>{{cliente?.persona?.nombres + " " + cliente?.persona?.apellidos + " - "
+                                +cliente?.persona?.celular}}</span>
+                        </option>
+                    </select>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                </div>
+                <div class="col-6 flex justify-end card profile-header mb-2 was-validated">
+                    <label for="codProducto"><b>{{'Producto(*): '}}</b></label>
+                    <select name="codProducto" formControlName="codProducto" required [compareWith]="compararProducto"
+                        placeholder="Seleccione producto..." class="form-control mr-sm-2" id="codProducto"
+                        (change)="buscarProductoPorCodigo()">
+                        <option [value]="" selected>Seleccionar producto</option>
+                        <option *ngFor="let producto of listaProducto" [value]="producto.codigo">
+                            <span>{{producto?.descripcion}}</span>
+                        </option>
+                    </select>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-9">
+                    <label for="descripcion"><b>{{'Descripción(*): '}}</b></label>
+                    <input type="text" name="descripcion" formControlName="descripcion" class="form-control"
+                        id="descripcion" placeholder="Por favor, ingrese la descripción."
+                        [ngClass]="{'is-valid': descripcionField?.dirty && !descripcionField?.invalid && !descripcionField?.errors, 'is-invalid': descripcionField?.dirty && descripcionField?.invalid && descripcionField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="descripcionField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label for="numExistenciaActual"><b>{{'Existencia:'}}</b></label>
+                    <input type="number" name="numExistenciaActual" formControlName="numExistenciaActual"
+                        class="form-control" id="numExistenciaActual" placeholder="999" [attr.disabled]="true">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-2">
+                    <label for="numMes"><b>{{'Meses(*):'}}</b></label>
+                    <input type="number" name="numMes" formControlName="numMes" class="form-control" id="numMes"
+                        placeholder="999" step="01" min="000" (keyup)="onKeyMes($event)"
+                        [ngClass]="{'is-valid': numMesField?.dirty && !numMesField?.invalid && !numMesField?.errors && (numMesField?.value > numMesField?.value), 'is-invalid': numMesField?.dirty && numMesField?.invalid && numMesField?.errors  && !(numMesField?.value > numMesField?.value)}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label for="fechaInicio"><b>{{'Fecha Inicio(*): '}}</b></label>
+                    <input type="date" name="fechaInicio" formControlName="fechaInicio" class="form-control"
+                        id="fechaInicio" (blur)="onKeyFechaInicio($event)" (change)="changeFechaInicio(this)"
+                        [ngClass]="{'is-valid': fechaInicioField?.dirty && !fechaInicioField?.invalid && !fechaInicioField?.errors,'is-invalid': fechaInicioField?.dirty && fechaInicioField?.invalid && fechaInicioField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="fechaInicioField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label for="fechaFin"><b>{{'Fecha Fin(*): '}}</b></label>
+                    <input type="date" name="fechaFin" formControlName="fechaFin" class="form-control" id="fechaFin"
+                        [ngClass]="{'is-valid': fechaFinField?.dirty && !fechaFinField?.invalid && !fechaFinField?.errors,'is-invalid': fechaFinField?.dirty && fechaFinField?.invalid && fechaFinField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="fechaFinField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-2">
+                    <label for="precio"><b>{{'Precio(*):'}}</b></label>
+                    <input type="number" name="precio" formControlName="precio" class="form-control" id="precio"
+                        placeholder="999.99" step="0.01" min="0.01" (keyup)="onKeyPrecio($event)"
+                        [ngClass]="{'is-valid': precioField?.dirty && !precioField?.invalid && !precioField?.errors && (precioField?.value > precioField?.value), 'is-invalid': precioField?.dirty && precioField?.invalid && precioField?.errors  && !(precioField?.value > precioField?.value)}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="precioField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label for="precioMayoreo"><b>{{'Por Mayor:'}}</b></label>
+                    <input type="number" name="precioMayoreo" formControlName="precioMayoreo" class="form-control"
+                        id="precioMayoreo" placeholder="999.99" [attr.disabled]="true">
+                </div>
+                <div class="col-2">
+                </div>
+                <div class="col-4">
+                    <label for="fechaCambia"><b>{{'Fecha Cambiar: '}}</b></label>
+                    <input type="date" name="fechaCambia" formControlName="fechaCambia" class="form-control"
+                        id="fechaCambia"
+                        [ngClass]="{'is-valid': fechaCambiaField?.dirty && !fechaCambiaField?.invalid && !fechaCambiaField?.errors,'is-invalid': fechaCambiaField?.dirty && fechaCambiaField?.invalid && fechaCambiaField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="fechaCambiaField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-2">
+                    <label for="numProducto"><b>{{'Cantidad(*):'}}</b></label>
+                    <input type="number" name="numProducto" formControlName="numProducto" class="form-control"
+                        id="numProducto" placeholder="999" step="001" min="001" (keyup)="onKeyCantidad($event)"
+                        [ngClass]="{'is-valid': numProductoField?.dirty && !numProductoField?.invalid && !numProductoField?.errors && (numProductoField?.value > numProductoField?.value), 'is-invalid': numProductoField?.dirty && numProductoField?.invalid && numProductoField?.errors  && !(numProductoField?.value > numProductoField?.value)}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="numProductoField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label for="monto"><b>{{'Monto(*):'}}</b></label>
+                    <input type="number" name="monto" formControlName="monto" class="form-control" id="monto"
+                        placeholder="999.99" [attr.disabled]="true">
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="claveCuenta"><b>{{'Usuario/Cuenta(*): '}}</b></label>
+                    <input type="text" name="claveCuenta" formControlName="claveCuenta" class="form-control"
+                        id="claveCuenta" placeholder="Usuario/Cuenta">
+                    <button matTooltip="Adicionar Usuario/Cuenta + Clave" type="button" class="btn btn-primary"
+                        [ngStyle]="{'display': 'none'}" rippleEffect round><i class="fa fa-plus"
+                            (click)="procesarListaCuentaClave()"></i></button>
+                </div>
+                <div class="col-6">
+                    <label for="clave"><b>{{'Clave: '}}</b></label>
+                    <input type="text" name="clave" formControlName="clave" class="form-control" id="clave"
+                        placeholder="Clave"
+                        [ngClass]="{'is-valid': claveField?.dirty && !claveField?.invalid && !claveField?.errors, 'is-invalid': claveField?.dirty && claveField?.invalid && claveField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-2">
+                    <label for="numDiasExtra"><b>{{'Días Extra:'}}</b></label>
+                    <input type="number" name="numDiasExtra" formControlName="numDiasExtra" class="form-control"
+                        id="numDiasExtra" placeholder="999" step="01" min="000" (keyup)="onKeyDiasExtra($event)"
+                        [ngClass]="{'is-valid': numDiasExtraField?.dirty && !numDiasExtraField?.invalid && !numDiasExtraField?.errors && (numDiasExtraField?.value > numDiasExtraField?.value), 'is-invalid': numDiasExtraField?.dirty && numDiasExtraField?.invalid && numDiasExtraField?.errors  && !(numDiasExtraField?.value > numDiasExtraField?.value)}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <label for="prefijoTelefonico"><b>{{'Prefijo: '}}</b></label>
+                    <input type="text" name="prefijoTelefonico" formControlName="prefijoTelefonico" class="form-control"
+                        id="prefijoTelefonico" placeholder="Prefijo Telefónico" [attr.disabled]="true">
+                </div>
+                <div class="col-3">
+                    <label for="celular"><b>{{'Celular: '}}</b></label>
+                    <input type="text" name="celular" formControlName="celular" class="form-control" id="celular"
+                        placeholder="Celular" [attr.disabled]="true">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-block btn-primary" [ngStyle]="{'display': 'none'}"
+                        [disabled]="formTransaccionConsulta?.invalid">
+                        {{transaccionEditar?'GUARDAR':'GUARDAR'}}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</app-detail>
+<ng-template #modal_success let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Éxito'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{transaccionEditar ?'Se ha actualizado el registro correctamente.':'Se ha agregado el registro
+        correctamente.'}}
+    </div>
+</ng-template>
+<ng-template #modal_error let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Error'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{transaccionEditar?'Ha habido un problema al actualizar el registro.':'Ha habido un problema al añadir el
+        registro.'}}
+    </div>
+</ng-template>
+
+<ng-template #modalCuentaClave let-modal>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Lista CuentaClave</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                (click)="modal.close('Cerrado desde la ventana')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="modal.close('Si')">Actualizar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="modal.close('No')">Cancelar</button>
+        </div>
+        <div class="modal-body">
+            <table class="table" *ngIf="listaCuentaClave?.length > 0" id="tablaCuentaClave">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">
+                            <div align="center">Usuario/Cuenta</div>
+                        </th>
+                        <th scope="col">
+                            <div align="center">Clave</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cuentaClave of listaCuentaClave ; let index=index">
+                        <td style="width:1%">{{index+1}}</td>
+                        <td>
+                            <input type="text" name="cuenta" style="width:135%" [(ngModel)]="cuentaClave.cuenta"
+                                id="cuenta">
+                        </td>
+                        <td>
+                            <input type="text" name="clave" style="width:120%" [(ngModel)]="cuentaClave.clave"
+                                id="clave">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="modal.close('Si')">Actualizar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="modal.close('No')">Cancelar</button>
+        </div>
+    </div>
+</ng-template>

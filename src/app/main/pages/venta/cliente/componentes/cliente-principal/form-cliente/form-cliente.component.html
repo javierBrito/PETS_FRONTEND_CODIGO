@@ -1,0 +1,174 @@
+<app-detail (close)="closeDetail($event)">
+    <h1 detail-title><strong>{{clienteEditar ?'EDITAR':'AGREGAR'}}{{' Cliente'}}</strong></h1>
+    <form detail-content [formGroup]="formCliente" (ngSubmit)="addRegistroPersona()">
+        <div class="container" style="border: 0px solid blue; box-shadow: 0px 10px 10px black">
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="identificacion"><b>{{'Identificación(*): '}}</b></label>
+                    <input type="text" name="identificacion" formControlName="identificacion" class="form-control"
+                        maxlength="60" id="identificacion" (keyup)="onKey($event)"
+                        placeholder="Por favor, ingrese la identificación"
+                        oninput="identificacion.value = identificacion.value.toUpperCase()"
+                        [ngClass]="{'is-valid': identificacionField?.dirty && !identificacionField?.invalid && !identificacionField?.errors, 'is-invalid': identificacionField?.dirty && identificacionField?.invalid && identificacionField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                </div>
+                <div class="col-6" [ngStyle]="{'display': 'none'}">
+                    <label for="fechaNacimiento"><b>{{'Nacimiento: '}}</b></label>
+                    <input type="date" name="fechaNacimiento" formControlName="fechaNacimiento" class="form-control"
+                        id="fechaNacimiento" 
+                        [ngClass]="{'is-valid': fechaNacimientoField?.dirty && !fechaNacimientoField?.invalid && !fechaNacimientoField?.errors,'is-invalid': fechaNacimientoField?.dirty && fechaNacimientoField?.invalid && fechaNacimientoField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="fechaNacimientoField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="nombres"><b>{{'Nombre(*): '}}</b></label>
+                    <input type="text" name="nombres" formControlName="nombres" class="form-control" id="nombres"
+                        [ngClass]="{'is-valid': nombresField?.dirty && !nombresField?.invalid && !nombresField?.errors, 'is-invalid': nombresField?.dirty && nombresField?.invalid && nombresField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="nombresField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label for="apellidos"><b>{{'Apellido(*): '}}</b></label>
+                    <input type="text" name="apellidos" formControlName="apellidos" class="form-control" id="apellidos"
+                        [ngClass]="{'is-valid': apellidosField?.dirty && !apellidosField?.invalid && !apellidosField?.errors, 'is-invalid': apellidosField?.dirty && apellidosField?.invalid && apellidosField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="apellidosField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="correo"><b>{{'Correo(*): '}}</b></label>
+                    <input type="text" name="correo" formControlName="correo" class="form-control"
+                        id="correo"
+                        [ngClass]="{'is-valid': correoField?.dirty && !correoField?.invalid && !correoField?.errors, 'is-invalid': correoField?.dirty && correoField?.invalid && correoField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="correoField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+
+                <div class="col-6">
+                    <label for="direccion"><b>{{'Dirección: '}}</b></label>
+                    <input type="text" name="direccion" formControlName="direccion"
+                        class="form-control" id="direccion"
+                        oninput="direccion.value = direccion.value.toUpperCase()"
+                        [ngClass]="{'is-valid': direccionField?.dirty && !direccionField?.invalid && !direccionField?.errors, 'is-invalid': direccionField?.dirty && direccionField?.invalid && direccionField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="direccionField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="codigo"><b>{{"Prefijo(*): "}}</b></label>
+                    <select name="codigo" formControlName="codigo" required [compareWith]="compararPrefijoTelefonico"
+                        placeholder="Prefijo telefónico" class="form-control mr-sm-2" id="codigo"
+                        (change)="buscarPrefijoTelefonico()">
+                        <option [value]="" selected>Prefijo telefónico</option>
+                        <option *ngFor="let prefijoTelefonico of listaPrefijoTelefonico" [value]="prefijoTelefonico.codigo">
+                            <span>{{prefijoTelefonico?.nombrePais+" / "+prefijoTelefonico?.codigo}}</span>
+                        </option>
+                    </select>
+                    <div class="valid-feedback"></div>
+                    <div class="invalid-feedback">Por favor seleccione una opción.</div>
+                </div>
+                <div class="col-6">
+                    <label for="celular"><b>{{'Celular(*): '}}</b></label>
+                    <input type="text" name="celular" formControlName="celular" class="form-control" id="celular"
+                        [ngClass]="{'is-valid': celularField?.dirty && !celularField?.invalid && !celularField?.errors, 'is-invalid': celularField?.dirty && celularField?.invalid && celularField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="celularField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            </div>
+        </div>
+        <br>
+        <div class="container" style="border: 0px solid black; box-shadow: 0px 10px 10px black" [ngStyle]="{'display': 'none'}">
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="fechaInicio"><b>{{'Inicio: '}}</b></label>
+                    <input type="date" name="fechaInicio" formControlName="fechaInicio" class="form-control"
+                        id="fechaInicio" 
+                        [ngClass]="{'is-valid': fechaInicioField?.dirty && !fechaInicioField?.invalid && !fechaInicioField?.errors,'is-invalid': fechaInicioField?.dirty && fechaInicioField?.invalid && fechaInicioField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="fechaInicioField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label for="tipoCliente"><b>{{'Tipo Cliente: '}}</b></label>
+                    <input type="text" name="tipoCliente" formControlName="tipoCliente" class="form-control"
+                        id="tipoCliente" oninput="tipoCliente.value = tipoCliente.value.toUpperCase()"
+                        [ngClass]="{'is-valid': tipoClienteField?.dirty && !tipoClienteField?.invalid && !tipoClienteField?.errors, 'is-invalid': tipoClienteField?.dirty && tipoClienteField?.invalid && tipoClienteField?.errors}">
+                    <div class="valid-feedback">
+                        <span>{{ "Exito"}}</span>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span *ngIf="tipoClienteField?.errors?.['required']">{{"Requerido"}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-block btn-primary" [disabled]="formCliente?.invalid">
+                    {{clienteEditar?'GUARDAR':'GUARDAR'}}</button>
+            </div>
+        </div>
+    </form>
+
+</app-detail>
+<ng-template #modal_success let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Éxito'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{clienteEditar ?'Se ha actualizado el registro correctamente.':'Se ha agregado el registro correctamente.'}}
+    </div>
+</ng-template>
+<ng-template #modal_error let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{'Error'}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        {{clienteEditar?'Ha habido un problema al actualizar el registro.':'Ha habido un problema al añadir el
+        registro.'}}
+    </div>
+</ng-template>
